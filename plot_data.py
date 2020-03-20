@@ -1,5 +1,6 @@
 import plotly.graph_objects as go  # plots
 import pandas
+import locale
 
 
 confirmed = pandas.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
@@ -9,6 +10,8 @@ deaths = pandas.read_csv("data/time_series/time_series_covid-19_nrw_deaths.csv")
 # create plot
 fig = go.Figure()
 
+locale.setlocale(locale.LC_ALL, 'de_DE')
+
 for kommune_idx in range(len(confirmed)):  
 
   kommune = confirmed.iloc[kommune_idx, 0]
@@ -17,7 +20,10 @@ for kommune_idx in range(len(confirmed)):
   recovered_ts = recovered.iloc[kommune_idx, 2:].T
   deaths_ts = deaths.iloc[kommune_idx, 2:].T
 
-  print(confirmed_ts)
+  confirmed_ts.index = pandas.to_datetime(confirmed_ts.index)
+  recovered_ts.index = pandas.to_datetime(recovered_ts.index)
+  deaths_ts.index = pandas.to_datetime(deaths_ts.index)
+
 
   fig.add_trace(
     go.Scatter(
@@ -26,11 +32,10 @@ for kommune_idx in range(len(confirmed)):
         name="Infektionen " + kommune,
         mode="lines+markers",
         legendgroup=kommune,
-        # ~ text="test",
         line=dict(color="orange"),
-        hovertemplate="Infektionen",
-        # ~ + "<extra></extra>",
-    )  # no additional legend text in tooltip
+        hovertemplate="Infektionen " + kommune + ": %{y}"
+          + "<extra></extra>" # no additional legend text in tooltip
+    )
     )
 
   fig.add_trace(
@@ -40,11 +45,10 @@ for kommune_idx in range(len(confirmed)):
         name="Genesene " + kommune,
         mode="lines+markers",
         legendgroup=kommune,
-        # ~ text=subdf_real.percentage,
         line=dict(color="green"),
-        hovertemplate="genesen"
-        + "<extra></extra>",
-    )  # no additional legend text in tooltip
+        hovertemplate="genesen " + kommune + ": %{y}"
+          + "<extra></extra>" # no additional legend text in tooltip
+    )
   )
 
   fig.add_trace(
@@ -54,15 +58,14 @@ for kommune_idx in range(len(confirmed)):
           name="Todesfälle " + kommune,
           mode="lines+markers",
           legendgroup=kommune,
-          # ~ text=subdf_real.percentage,
           line=dict(color="black"),
-          hovertemplate="Todesfälle"
-          + "<extra></extra>",
-      )  # no additional legend text in tooltip
+          hovertemplate="Todesfälle " + kommune + ": %{y}"
+            + "<extra></extra>" # no additional legend text in tooltip
+      )  
   )
 
 fig.update_layout(
-  title="Coronafälle in Münster",
+  title="Coronafälle in Münster (Stand: 20. März, Quelle: <a href='https://www.muenster.de/corona'>muenster.de/corona</a>)",
   xaxis_title="Datum",
   yaxis_title="Fälle",
   # disable dragmode for better mobile experience
@@ -73,8 +76,10 @@ fig.update_layout(
 
 # write plot to file
 fig.write_html("index.html",
-  include_plotlyjs=True,
-  config={"displayModeBar": False},
-  full_html=True,
-  auto_open=True,
+  include_plotlyjs="cdn",
+  config={"displayModeBar": False,
+          "locale": "de"},
+  auto_open=True
 )
+# ~ <script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
+
