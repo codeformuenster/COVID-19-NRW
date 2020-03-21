@@ -65,9 +65,10 @@ for kommune_idx in range(len(confirmed)):
   )
 
 fig.update_layout(
-  title="Coronafälle in Münster (Stand: 21. März, 17 Uhr, Quellen: <a href='https://www.muenster.de/corona'>muenster.de/corona</a> und <a href='https://www.bezreg-muenster.de/de/im_fokus/uebergreifende_themen/coronavirus/coronavirus_allgemein/index.html'>Bezirksregierung Münster</a>)",
+  title="Coronafälle in Münster (Stand: 21. März, 17 Uhr)<br>Quellen: <a href='https://www.muenster.de/corona'>muenster.de/corona</a> und <a href='https://www.bezreg-muenster.de/de/im_fokus/uebergreifende_themen/coronavirus/coronavirus_allgemein/index.html'>Bezirksregierung Münster</a>",
   xaxis_title="Datum",
   yaxis_title="Fälle",
+  legend_orientation="h",
   # disable dragmode for better mobile experience
   dragmode=False,
   # German number separators
@@ -81,5 +82,28 @@ fig.write_html("index.html",
           "locale": "de"},
   auto_open=True
 )
-# ~ <script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
+
+# this needs to be copy-pasted to the created html file
+
+# after the plotly script
+# <script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
+
+# at the bottom
+#Ein Projekt von <a href="https://codeformuenster.org"><img src="cfm_logo.png"></a><br>
+#<a href="https://codeformuenster.org/impressum/">Impressum und Datenschutzerklärung</a>
+#<!-- Fathom - simple website analytics - https://github.com/usefathom/fathom -->
+#<script>
+#(function(f, a, t, h, o, m){
+#	a[h]=a[h]||function(){
+#		(a[h].q=a[h].q||[]).push(arguments)
+#	};
+#	o=f.createElement('script'),
+#	m=f.getElementsByTagName('script')[0];
+#	o.async=1; o.src=t; o.id='fathom-script';
+#	m.parentNode.insertBefore(o,m)
+#})(document, window, '//fathom.codeformuenster.org/tracker.js', 'fathom');
+#fathom('set', 'siteId', 'JJUAP');
+#fathom('trackPageview');
+#</script>
+#<!-- / Fathom -->
 
