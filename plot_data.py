@@ -65,7 +65,7 @@ for kommune_idx in range(len(confirmed)):
   )
 
 fig.update_layout(
-  title="Coronafälle in Münster (Stand: 20. März, Quelle: <a href='https://www.muenster.de/corona'>muenster.de/corona</a>)",
+  title="Coronafälle in Münster (Stand: 21. März, 17 Uhr, Quellen: <a href='https://www.muenster.de/corona'>muenster.de/corona</a> und <a href='https://www.bezreg-muenster.de/de/im_fokus/uebergreifende_themen/coronavirus/coronavirus_allgemein/index.html'>Bezirksregierung Münster</a>)",
   xaxis_title="Datum",
   yaxis_title="Fälle",
   # disable dragmode for better mobile experience
