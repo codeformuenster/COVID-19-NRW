@@ -1,24 +1,91 @@
 import plotly.graph_objects as go  # plots
 import pandas
 import locale
+import glob
 
 
-confirmed = pandas.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
-recovered = pandas.read_csv("data/time_series/time_series_covid-19_nrw_recovered.csv")
-deaths = pandas.read_csv("data/time_series/time_series_covid-19_nrw_deaths.csv")
+daily_report_files = glob.glob('data/daily_reports/*.csv')
 
-# create plot
-fig = go.Figure()
+all_data = pandas.DataFrame({'Kommune': [],
+                            'Last Update Day': [],
+                            'Last Update Time': [],
+                            'Confirmed': [],
+                            'Deaths': [],
+                            'Recovered': [],
+                            'Quarantine': [],
+                            'Source (Link)': []
+                            })
+
+for f in daily_report_files:
+  all_data = pandas.concat([pandas.read_csv(f), all_data], sort=False)
+
+all_data['Last Update Day'] = pandas.to_datetime(all_data['Last Update Day'])
+all_data['Last Update Time'] = pandas.to_datetime(all_data['Last Update Time'])
+all_data['Confirmed'] = all_data['Confirmed'].astype(int)
+all_data['Recovered'] = all_data['Recovered'].astype(int)
+all_data['Deaths'] = all_data['Deaths'].astype(int)
+# ~ all_data['Deaths'] = all_data['Quarantine'].astype(int)
+
+all_data = all_data.sort_values(by='Last Update Day')
+
+confirmed_df = pandas.DataFrame({'Kommune': all_data['Kommune'].unique()})
+recovered_df = pandas.DataFrame({'Kommune': all_data['Kommune'].unique()})
+deaths_df = pandas.DataFrame({'Kommune':  all_data['Kommune'].unique()})
+
+confirmed_df = confirmed_df.set_index('Kommune', drop=True)
+recovered_df = recovered_df.set_index('Kommune', drop=True)
+deaths_df = deaths_df.set_index('Kommune', drop=True)
+
+
+for day in all_data['Last Update Day'].dt.date.unique():
+
+  for kommune in all_data['Kommune'].unique():
+    all_data_kommune = all_data[all_data['Kommune'] == kommune]
+
+    c = all_data_kommune[all_data_kommune['Last Update Day'] == pandas.Timestamp(day)]['Confirmed'].values
+    r = all_data_kommune[all_data_kommune['Last Update Day'] == pandas.Timestamp(day)]['Recovered'].values
+    d = all_data_kommune[all_data_kommune['Last Update Day'] == pandas.Timestamp(day)]['Deaths'].values
+    
+    if len(c) == 1:
+      confirmed_df.loc[kommune, day] = c
+
+    if len(r) == 1:
+      recovered_df.loc[kommune, day] = r
+      
+    if len(d) == 1:
+      deaths_df.loc[kommune, day] = d
+
+confirmed_df.to_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
+recovered_df.to_csv("data/time_series/time_series_covid-19_nrw_recovered.csv")
+deaths_df.to_csv("data/time_series/time_series_covid-19_nrw_deaths.csv")
+
+print(confirmed_df)
 
 locale.setlocale(locale.LC_ALL, 'de_DE')
 
-for kommune_idx in range(len(confirmed)):  
+# ~ for kommune_idx in range(len(confirmed_df)):
+# ~ for kommune, row in confirmed_df.iterrows():
+    
+for kommune in all_data['Kommune'].unique():
 
-  kommune = confirmed.iloc[kommune_idx, 0]
+  # create plot
+  fig = go.Figure()
+
+  # ~ kommune = confirmed_df.iloc[kommune_idx, 0]
   
-  confirmed_ts = confirmed.iloc[kommune_idx, 2:].T  
-  recovered_ts = recovered.iloc[kommune_idx, 2:].T
-  deaths_ts = deaths.iloc[kommune_idx, 2:].T
+  print(kommune)
+
+  # ~ print(kommune_idx)
+
+  all_data_kommune = all_data[all_data['Kommune'] == kommune]
+  
+  # ~ confirmed_ts = confirmed_df.iloc[kommune, 2:].T
+  # ~ recovered_ts = recovered_df.iloc[kommune, 2:].T
+  # ~ deaths_ts = deaths_df.iloc[kommune, 2:].T
+  
+  confirmed_ts = confirmed_df.loc[kommune, :].T
+  recovered_ts = recovered_df.loc[kommune, :].T
+  deaths_ts = deaths_df.loc[kommune, :].T
 
   confirmed_ts.index = pandas.to_datetime(confirmed_ts.index)
   recovered_ts.index = pandas.to_datetime(recovered_ts.index)
@@ -32,7 +99,8 @@ for kommune_idx in range(len(confirmed)):
         name="Infektionen " + kommune,
         mode="lines+markers",
         legendgroup=kommune,
-        line=dict(color="orange"),
+        line=dict(color="orange", width=4),
+        marker=dict(size=10),
         hovertemplate="Infektionen " + kommune + ": %{y}"
           + "<extra></extra>" # no additional legend text in tooltip
     )
@@ -45,7 +113,8 @@ for kommune_idx in range(len(confirmed)):
         name="Genesene " + kommune,
         mode="lines+markers",
         legendgroup=kommune,
-        line=dict(color="green"),
+        line=dict(color="green", width=4),
+        marker=dict(size=10),
         hovertemplate="genesen " + kommune + ": %{y}"
           + "<extra></extra>" # no additional legend text in tooltip
     )
@@ -58,52 +127,33 @@ for kommune_idx in range(len(confirmed)):
           name="Todesfälle " + kommune,
           mode="lines+markers",
           legendgroup=kommune,
-          line=dict(color="black"),
+          line=dict(color="black", width=4),
+          marker=dict(size=10),
           hovertemplate="Todesfälle " + kommune + ": %{y}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )
 
-fig.update_layout(
-  title="Coronafälle in Münster (Stand: 21. März, 17 Uhr)<br>Quellen: <a href='https://www.muenster.de/corona'>muenster.de/corona</a> und <a href='https://www.bezreg-muenster.de/de/im_fokus/uebergreifende_themen/coronavirus/coronavirus_allgemein/index.html'>Bezirksregierung Münster</a>",
-  xaxis_title="Datum",
-  yaxis_title="Fälle",
-  legend_orientation="h",
-  # disable dragmode for better mobile experience
-  dragmode=False,
-  # German number separators
-  separators=",."
+  last_update_date = str(all_data_kommune.iloc[-1]['Last Update Day'].strftime('%d. %B'))
+  last_update_time = str(all_data_kommune.iloc[-1]['Last Update Time'].hour)
+  last_update_source = str(all_data_kommune.iloc[-1]['Source (Link)'])
+
+  fig.update_layout(
+    title="Coronafälle in " + kommune + " (Stand: " + last_update_date + ", " + last_update_time + 
+    " Uhr)<br>Quelle: <a href='" + last_update_source + "'>muenster.de/corona</a>",
+    xaxis_title="Datum",
+    yaxis_title="Fälle",
+    legend_orientation="h",
+    # disable dragmode for better mobile experience
+    dragmode=False,
+    # German number separators
+    separators=",."
 )
 
-# write plot to file
-fig.write_html("index.html",
-  include_plotlyjs="cdn",
-  config={"displayModeBar": False,
-          "locale": "de"},
-  auto_open=True
-)
-
-# this needs to be copy-pasted to the created html file
-
-# after the plotly script
-# <script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
-
-# at the bottom
-#Ein Projekt von <a href="https://codeformuenster.org"><img src="cfm_logo.png"></a><br>
-#<a href="https://codeformuenster.org/impressum/">Impressum und Datenschutzerklärung</a>
-#<!-- Fathom - simple website analytics - https://github.com/usefathom/fathom -->
-#<script>
-#(function(f, a, t, h, o, m){
-#	a[h]=a[h]||function(){
-#		(a[h].q=a[h].q||[]).push(arguments)
-#	};
-#	o=f.createElement('script'),
-#	m=f.getElementsByTagName('script')[0];
-#	o.async=1; o.src=t; o.id='fathom-script';
-#	m.parentNode.insertBefore(o,m)
-#})(document, window, '//fathom.codeformuenster.org/tracker.js', 'fathom');
-#fathom('set', 'siteId', 'JJUAP');
-#fathom('trackPageview');
-#</script>
-#<!-- / Fathom -->
-
+  # write plot to file
+  fig.write_html(kommune+".html",
+    include_plotlyjs="cdn",
+    config={"displayModeBar": False,
+            "locale": "de"},
+    auto_open=True
+  )
