@@ -99,7 +99,7 @@ for kommune in all_data['Kommune'].unique():
         legendgroup=kommune,
         line=dict(color="orange", width=4),
         marker=dict(size=10),
-        hovertemplate="Infektionen " + kommune + ": %{y}"
+        hovertemplate="Infektionen " + kommune + ", %{x}: %{y}"
           + "<extra></extra>" # no additional legend text in tooltip
     )
     )
@@ -113,7 +113,7 @@ for kommune in all_data['Kommune'].unique():
         legendgroup=kommune,
         line=dict(color="green", width=4),
         marker=dict(size=10),
-        hovertemplate="genesen " + kommune + ": %{y}"
+        hovertemplate="genesen " + kommune + ", %{x}: %{y}"
           + "<extra></extra>" # no additional legend text in tooltip
     )
   )
@@ -127,7 +127,7 @@ for kommune in all_data['Kommune'].unique():
           legendgroup=kommune,
           line=dict(color="black", width=4),
           marker=dict(size=10),
-          hovertemplate="Todesfälle " + kommune + ": %{y}"
+          hovertemplate="Todesfälle " + kommune + ", %{x}: %{y}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )

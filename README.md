@@ -56,6 +56,7 @@ fathom('trackPageview');
   href="http://creativecommons.org/publicdomain/zero/1.0/">
   <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0" />
 </a>
+
 Die Daten (Ordner `data`) sind unter CC0 lizenziert.
 Soweit wie es möglich ist, verzichten wir auf jegliches Copyright/Urheberrecht und stellen diese Daten als gemeinfrei zur Verfügung. Sollte das nicht möglich sein, so erteilen wir hiermit eine bedinungslose Lizenz für die Daten.
 
