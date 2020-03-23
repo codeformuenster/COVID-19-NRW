@@ -2,7 +2,7 @@ import plotly.graph_objects as go  # plots
 import pandas
 import locale
 import glob
-
+import os
 
 daily_report_files = glob.glob('data/daily_reports/*.csv')
 
@@ -146,8 +146,7 @@ for kommune in all_data['Kommune'].unique():
     legend_orientation="h",
     # disable dragmode for better mobile experience
     dragmode=False,
-    # German number separators
-    separators=",."
+    font=dict(size=22)
 )
 
   # write plot to file
@@ -157,3 +156,6 @@ for kommune in all_data['Kommune'].unique():
             "locale": "de"},
     auto_open=True
   )
+
+os.system("python plot_barchart.py")
+
