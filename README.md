@@ -14,11 +14,20 @@ Für einen deutschen Plot muss dann noch folgendes in die erstellte HTML-Datei e
 <script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
 ```
 
+Dies ist für die zweite Grafik:
+
+```
+<div>
+  <img src='images/covid-19-muenster.svg'/>
+</div>
+```
+
 Die HTML-Datei sollte damit alleine lauffähig sein.
 
 Außerdem folgenden Code ganz nach unten für unser Logo & Co und damit wir sehen, wieviele Leute sich die Visualisierung angucken:
 
 ```
+<br>
 Ein Projekt von <a href="https://codeformuenster.org"><img src="cfm_logo.png"></a><br>
 <a href="https://codeformuenster.org/impressum/">Impressum und Datenschutzerklärung</a>
 <!-- Fathom - simple website analytics - https://github.com/usefathom/fathom -->
