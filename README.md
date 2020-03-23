@@ -17,7 +17,7 @@ Für einen deutschen Plot muss dann noch folgendes in die erstellte HTML-Datei e
 Dies ist für die zweite Grafik:
 
 ```
-</div>
+<div>
   <img src='images/covid-19-muenster.svg'/>
 </div>
 ```
