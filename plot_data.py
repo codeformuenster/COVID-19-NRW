@@ -59,8 +59,6 @@ confirmed_df.to_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
 recovered_df.to_csv("data/time_series/time_series_covid-19_nrw_recovered.csv")
 deaths_df.to_csv("data/time_series/time_series_covid-19_nrw_deaths.csv")
 
-print(confirmed_df)
-
 locale.setlocale(locale.LC_ALL, 'de_DE')
 
 # ~ for kommune_idx in range(len(confirmed_df)):
@@ -140,7 +138,7 @@ for kommune in all_data['Kommune'].unique():
 
   fig.update_layout(
     title="Coronafälle in " + kommune + " (Stand: " + last_update_date + ", " + last_update_time + 
-    " Uhr)<br>Quelle: <a href='" + last_update_source + "'>muenster.de/corona</a>",
+    " Uhr)<br><a href='" + last_update_source + "'>Quelle (klick!)</a>",
     xaxis_title="Datum",
     yaxis_title="Fälle",
     legend_orientation="h",
