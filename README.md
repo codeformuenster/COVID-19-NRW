@@ -1,64 +1,17 @@
 # COVID-19-NRW
 
 Doku noch sehr rudimentär, sorry!
-Daten bisher nur für Münster, tendentiell sollte es aber auch für andere Kommunen klappen.
+Daten für den Regierrungsbezirk Münster, s. DAtenlizenz unten.
 
-Um eine neue Kommune hinzuzufügen, eine entsprechende Zeile unter `data/daily_reports` schreiben.
-Dann `python plot_data.py` ausführen.
-
-Für einen deutschen Plot muss dann noch folgendes in die erstellte HTML-Datei eingefügt werden (s. https://github.com/plotly/plotly.py/issues/2302):
-
-```
-# this needs to be copy-pasted to the created html file
-# after the plotly script
-<script src="https://cdn.plot.ly/plotly-locale-de-latest.js"></script>
-```
-
-Dies ist für die zweite Grafik:
-
-```
-<div>
-  <img src='images/covid-19-muenster.svg'/>
-</div>
-```
-
-Die HTML-Datei sollte damit alleine lauffähig sein.
-
-Außerdem folgenden Code ganz nach unten für unser Logo & Co und damit wir sehen, wieviele Leute sich die Visualisierung angucken:
-
-```
-<br>
-Ein Projekt von <a href="https://codeformuenster.org"><img src="cfm_logo.png"></a><br>
-<a href="https://codeformuenster.org/impressum/">Impressum und Datenschutzerklärung</a>
-<!-- Fathom - simple website analytics - https://github.com/usefathom/fathom -->
-<script>
-(function(f, a, t, h, o, m){
-  a[h]=a[h]||function(){
-    (a[h].q=a[h].q||[]).push(arguments)
-  };
-  o=f.createElement('script'),
-  m=f.getElementsByTagName('script')[0];
-  o.async=1; o.src=t; o.id='fathom-script';
-m.parentNode.insertBefore(o,m)
-})(document, window, '//fathom.codeformuenster.org/tracker.js', 'fathom');
-fathom('set', 'siteId', 'JJUAP');
-fathom('trackPageview');
-</script>
-<!-- / Fathom -->
-```
+Erst `python convert_ODMS_file_to_timeseries.py`, dann `python plot_data.py` ausführen.
+Für jede Kommune/Landkreise sollte nun eine lauffähige HTMl-Datei erstellt worden sein.
 
 
 ## Rechtliches
 
 ### Datenlizenz
 
-<a rel="license"
-  href="http://creativecommons.org/publicdomain/zero/1.0/">
-  <img src="https://licensebuttons.net/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0" />
-</a>
-
-Die Daten (Ordner `data`) sind unter CC0 lizenziert.
-Soweit wie es möglich ist, verzichten wir auf jegliches Copyright/Urheberrecht und stellen diese Daten als gemeinfrei zur Verfügung. Sollte das nicht möglich sein, so erteilen wir hiermit eine bedinungslose Lizenz für die Daten.
+Die Daten [stammen aus dem Open-Data-Portal der Stadt Münster (Datenquelle: Bezirksregierung Münster)](https://opendata.stadt-muenster.de/dataset/coronavirus-infektionen-sars-cov-2-im-regierungsbezirk-m%C3%BCnster). Sie sind unter der [„Datenlizenz Deutschland – Namensnennung – Version 2.0"](https://www.govdata.de/dl-de/by-2-0) lizenziert.
 
 ### Softwarelizenz
 

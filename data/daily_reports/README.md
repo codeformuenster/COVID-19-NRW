@@ -1,0 +1,1 @@
+Diese Daten werden nicht mehr aktualisert. Für aktuelle Daten bitte auf [dem Open-Data-Portal der Stadt Münster](https://opendata.stadt-muenster.de/dataset/coronavirus-infektionen-sars-cov-2-im-regierungsbezirk-m%C3%BCnster) schauen.
