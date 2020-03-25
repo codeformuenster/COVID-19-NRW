@@ -93,7 +93,7 @@ def save():
       image_name = "images/covid-19-" + kommune_short + ".svg"
       fig.savefig(image_name)
       f = open("diff_plot_" + kommune_short + "_temp.html", "w")
-      f.write("<div>")
+      f.write('<div style="text-align: center;">')
       f.write("<img src='" + image_name + "'/>")
       f.write("</div>")
       f.close()
