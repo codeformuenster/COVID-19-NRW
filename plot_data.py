@@ -3,7 +3,7 @@ import pandas
 import os
 import locale
 
-locale.setlocale(locale.LC_ALL, 'de_DE')
+locale.setlocale(locale.LC_ALL, 'de_DE.utf8')
 
 os.system("python plot_barchart.py")
 
