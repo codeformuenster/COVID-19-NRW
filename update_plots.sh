@@ -1,3 +1,4 @@
+git pull
 python convert_ODMS_file_to_timeseries.py
 python plot_data.py
 git add data/
