@@ -1,3 +1,10 @@
+if [ $# -eq 0 ]
+  then
+    echo "No arguments supplied"
+    echo "Usage: ./update_münster_only.sh infected_int recovered_int deaths_int"
+    exit 1
+fi
+
 python add_only_MS_counts_to_timeseries.py $1 $2 $3
 python plot_data.py
 git add data/time_series/
