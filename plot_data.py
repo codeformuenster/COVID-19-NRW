@@ -108,7 +108,7 @@ for kommune in confirmed_df.index.unique():
           mode="lines",
           line=dict(color="grey", width=4, dash='dash'),
           marker=dict(size=10),
-          hovertemplate="Verdopplung alle 2 Tage"
+          hovertemplate="Verdopplung alle 2 Tage"  + ", %{y:.0f}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )
@@ -122,7 +122,7 @@ for kommune in confirmed_df.index.unique():
           mode="lines",
           line=dict(color="grey", width=4, dash='dash'),
           marker=dict(size=10),
-          hovertemplate="Verdopplung alle 3 Tage"
+          hovertemplate="Verdopplung alle 3 Tage" + ", %{y:.0f}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )
@@ -136,7 +136,7 @@ for kommune in confirmed_df.index.unique():
           mode="lines",
           line=dict(color="grey", width=4, dash='dash'),
           marker=dict(size=10),
-          hovertemplate="Verdopplung alle 5 Tage"
+          hovertemplate="Verdopplung alle 5 Tage" + ", %{y:.0f}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )
@@ -150,7 +150,7 @@ for kommune in confirmed_df.index.unique():
           mode="lines",
           line=dict(color="grey", width=4, dash='dash'),
           marker=dict(size=10),
-          hovertemplate="Verdopplung alle 10 Tage"
+          hovertemplate="Verdopplung alle 10 Tage" + ", %{y:.0f}"
             + "<extra></extra>" # no additional legend text in tooltip
       )  
   )
@@ -176,7 +176,7 @@ for kommune in confirmed_df.index.unique():
     # ~ auto_open=True
   )
   
-  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', kommune_short.lower()+'_temp_log.html', 'footer.html']
+  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', kommune_short.lower()+'_log_temp.html', 'footer.html']
   with open(kommune_short.lower()+'.html', 'w') as outfile:
     for fname in filenames:
         with open(fname) as infile:
