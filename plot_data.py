@@ -1,5 +1,6 @@
 import plotly.graph_objects as go  # plots
 import pandas
+import numpy
 import os
 import locale
 
@@ -29,7 +30,6 @@ for kommune in confirmed_df.index.unique():
   confirmed_ts.index = pandas.to_datetime(confirmed_ts.index)
   recovered_ts.index = pandas.to_datetime(recovered_ts.index)
   deaths_ts.index = pandas.to_datetime(deaths_ts.index)
-
 
   fig.add_trace(
     go.Scatter(
@@ -87,8 +87,8 @@ for kommune in confirmed_df.index.unique():
     # disable dragmode for better mobile experience
     dragmode=False,
     font=dict(size=22),
-    xaxis_tickformat = '%d. %B'
-)
+    xaxis_tickformat = '%d. %B',
+  )
 
   # write plot to file
   fig.write_html(kommune_short.lower()+'_temp.html',
@@ -99,7 +99,84 @@ for kommune in confirmed_df.index.unique():
     # ~ auto_open=True
   )
 
-  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', 'footer.html']
+  fig.add_trace(
+      go.Scatter(
+          x=confirmed_ts.index,
+          y=2**((confirmed_ts.index - confirmed_ts.index[0]).days/2),
+          name="Verdoppelung alle 2 Tage",
+          connectgaps=True,
+          mode="lines",
+          line=dict(color="grey", width=4, dash='dash'),
+          marker=dict(size=10),
+          hovertemplate="Verdopplung alle 2 Tage"
+            + "<extra></extra>" # no additional legend text in tooltip
+      )  
+  )
+
+  fig.add_trace(
+      go.Scatter(
+          x=confirmed_ts.index,
+          y=2**((confirmed_ts.index - confirmed_ts.index[0]).days/3),
+          name="Verdoppelung alle 3 Tage ",
+          connectgaps=True,
+          mode="lines",
+          line=dict(color="grey", width=4, dash='dash'),
+          marker=dict(size=10),
+          hovertemplate="Verdopplung alle 3 Tage"
+            + "<extra></extra>" # no additional legend text in tooltip
+      )  
+  )
+
+  fig.add_trace(
+      go.Scatter(
+          x=confirmed_ts.index,
+          y=2**((confirmed_ts.index - confirmed_ts.index[0]).days/5),
+          name="Verdoppelung alle 5 Tage ",
+          connectgaps=True,
+          mode="lines",
+          line=dict(color="grey", width=4, dash='dash'),
+          marker=dict(size=10),
+          hovertemplate="Verdopplung alle 5 Tage"
+            + "<extra></extra>" # no additional legend text in tooltip
+      )  
+  )
+
+  fig.add_trace(
+      go.Scatter(
+          x=confirmed_ts.index,
+          y=2**((confirmed_ts.index - confirmed_ts.index[0]).days/10),
+          name="Verdoppelung alle 10 Tage ",
+          connectgaps=True,
+          mode="lines",
+          line=dict(color="grey", width=4, dash='dash'),
+          marker=dict(size=10),
+          hovertemplate="Verdopplung alle 10 Tage"
+            + "<extra></extra>" # no additional legend text in tooltip
+      )  
+  )
+  
+  fig.update_layout(
+    title="Coronafälle, logarithmisch<br>" + kommune + " (Stand: " + last_update_date + ")",
+    xaxis_title="Datum",
+    yaxis_title="Fälle (logarithmische Skala)",
+    legend_orientation="h",
+    # disable dragmode for better mobile experience
+    dragmode=False,
+    font=dict(size=22),
+    xaxis_tickformat = '%d. %B',
+    yaxis_type="log"
+  )
+   
+  # write plot to file
+  fig.write_html(kommune_short.lower()+'_log_temp.html',
+    include_plotlyjs=False,
+    full_html=False,
+    config={"displayModeBar": False,
+            "locale": "de"}
+    # ~ auto_open=True
+  )
+  
+  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', kommune_short.lower()+'_temp_log.html', 'footer.html']
   with open(kommune_short.lower()+'.html', 'w') as outfile:
     for fname in filenames:
         with open(fname) as infile:
