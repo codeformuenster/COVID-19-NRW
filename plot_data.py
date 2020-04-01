@@ -76,8 +76,7 @@ for kommune in confirmed_df.index.unique():
       )  
   )
 
-  last_update_date = max(confirmed_ts.index).strftime('%d. %B') #str(all_data_kommune.iloc[-1]['Last Update Day'].strftime('%d. %B'))
-  # ~ last_update_source = str(all_data_kommune.iloc[-1]['Source (Link)'])
+  last_update_date = max(confirmed_ts.index).strftime('%-d. %B')
 
   fig.update_layout(
     title="Coronafälle<br>" + kommune + " (Stand: " + last_update_date + ")",
@@ -87,7 +86,7 @@ for kommune in confirmed_df.index.unique():
     # disable dragmode for better mobile experience
     dragmode=False,
     font=dict(size=22),
-    xaxis_tickformat = '%d. %B',
+    xaxis_tickformat = '%-d. %B',
   )
 
   # write plot to file
@@ -163,7 +162,7 @@ for kommune in confirmed_df.index.unique():
     # disable dragmode for better mobile experience
     dragmode=False,
     font=dict(size=22),
-    xaxis_tickformat = '%d. %B',
+    xaxis_tickformat = '%-d. %B',
     yaxis_type="log"
   )
    
