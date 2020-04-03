@@ -9,7 +9,7 @@ import locale
 
 locale.setlocale(locale.LC_ALL, 'de_DE.utf8')
 
-os.system("python plot_barchart.py")
+os.system("python3 plot_barchart.py")
 
 confirmed_df = pandas.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
 recovered_df = pandas.read_csv("data/time_series/time_series_covid-19_nrw_recovered.csv")
