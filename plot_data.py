@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import plotly.graph_objects as go  # plots
 import pandas
 import numpy
