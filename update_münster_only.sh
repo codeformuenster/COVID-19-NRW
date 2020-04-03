@@ -9,8 +9,8 @@ cd "$1"
 
 git stash
 git pull
-python add_only_MS_counts_to_timeseries.py $2 $3 $4
-python plot_data.py
+python3 add_only_MS_counts_to_timeseries.py $2 $3 $4
+python3 plot_data.py
 git add data/time_series/
 git add images/covid-19-münster.svg
 git add münster.html
