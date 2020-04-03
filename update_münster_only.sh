@@ -5,6 +5,8 @@ if [ $# -eq 0 ]
     exit 1
 fi
 
+git stash
+git pull
 python add_only_MS_counts_to_timeseries.py $1 $2 $3
 python plot_data.py
 git add data/time_series/
