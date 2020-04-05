@@ -80,6 +80,7 @@ def load(kommune):
     # df = df[df.confirmed >= 10].reset_index()
 
     df["active"] = df["confirmed"] - df["recovered"] - df["deaths"]
+    df["active_without_new"] = df["confirmed"] - df["recovered"] - df["deaths"] - df['confirmed_new']
     df["active_delta"] = df_deaths["deaths"].diff()
     df["active_change_rate"] = df_deaths["deaths"].pct_change()
 
@@ -104,13 +105,13 @@ def plot_pd(df):
 
     ax = df.plot.bar(
         x="date",
-        y=["recovered", "active", "confirmed_new"],
+        y=["recovered", "active_without_new", "confirmed_new"],
         stacked=True,
         color=["#dbcd00", "#2792cb", "#00548b"],
         figsize=(20, 10),
         width=0.8,
         fontsize=13,
-        edgecolor="#2792cb",
+        # edgecolor="#2792cb",
         linewidth=2,
     )
 
@@ -119,10 +120,10 @@ def plot_pd(df):
         text = '%.0f' % row["confirmed_new"]
         ax.text(
             index,
-            df["confirmed"].loc[index] + 1.0,
+            df['recovered'].loc[index] + df["active"].loc[index] - df["confirmed_new"].loc[index] + 3,
+            # df["active"].loc[index],
             text,
             horizontalalignment='center',
-            verticalalignment='bottom',
             fontsize=10,
             color="#FFFFFF",
         )
@@ -130,9 +131,10 @@ def plot_pd(df):
     for index, row in df.iterrows():
         text = int(row["active"])
         ax.text(
-            index - 0.30,
+            index,
             df['recovered'].loc[index] + df["active"].loc[index] / 2 + 3.0,
             text,
+            horizontalalignment='center',
             fontsize=10,
             color="#FFFFFF",
         )
@@ -140,9 +142,10 @@ def plot_pd(df):
     for index, row in df.iterrows():
         text = int(row["recovered"])
         ax.text(
-            index - 0.30,
+            index,
             df["recovered"].loc[index] / 2 + 3.0,
             text,
+            horizontalalignment='center',
             fontsize=10,
             color="#FFFFFF",
         )
@@ -166,7 +169,7 @@ def plot_pd(df):
     ax.yaxis.tick_right()
     ax.legend(["Genesene", "Erkrankte", "Neuinfektionen"], frameon=False)
     ax.hlines(
-        max(df["confirmed"]) + 3),
+        max(df["confirmed"]),
         idx_doubled_since,
         idx_last_entry,
         linestyles='dashed',
