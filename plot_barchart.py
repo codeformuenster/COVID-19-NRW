@@ -10,6 +10,12 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 
+# set jupyter's max row display
+pd.set_option('display.max_row', 1000)
+
+# set jupyter's max column width to 50
+pd.set_option('display.max_columns', 50)
+
 matplotlib.use("agg")
 
 
@@ -80,29 +86,53 @@ def load(kommune):
 
 def plot_pd(df):
     kommune = 'Stadt Münster'
+
     df = load(kommune)
+
+    # idx_first_day_with_100_confirmed = df[df['confirmed'] >= 100].index.min()
+    # df = df.iloc[idx_first_day_with_100_confirmed:-1]
+
 
     idx_last_entry = df.index.max()
     idx_doubled_since = df[df['confirmed'] <= max(df['confirmed'] / 2)].index.max()
 
-    last_entry_date = df.iloc[idx_last_entry]['date']
-    doubled_since_date = df.iloc[idx_doubled_since]['date']
+    last_entry_date = df.loc[idx_last_entry]['date']
+    doubled_since_date = df.loc[idx_doubled_since]['date']
 
     doubled_since_in_days = (last_entry_date - doubled_since_date).days - 1
 
-    ax = df.plot.bar(x='date', y=['confirmed_yesterday', 'confirmed_new'], stacked=True, color=['#2792cb', '#00548b'], figsize=(12,10) )
+    ax = df.plot.bar(x='date', y=['confirmed_yesterday', 'confirmed_new'], stacked=True, color=['#2792cb', '#00548b'], figsize=(20,10), width=0.8, fontsize=13 )
+
+    for index, row in df.iterrows():
+        text = ('{:.1%}'.format(row['confirmed_change_rate']))
+        ax.text(index -.33, df['confirmed'].loc[index] + 3.0, \
+                text, fontsize=10, color='#00548b')
+
+    for index, row in df.iterrows():
+        text = int(row['confirmed'])
+        ax.text(index -.33, df['confirmed'].loc[index] / 2 + 3.0, \
+                text, fontsize=10, color='#FFFFFF')
+
+    # for index, row in df.iterrows():
+        # text = ('{:.1%}'.format(row['confirmed_change_rate']))
+        # ax.annotate(text,(index ,df['confirmed'].loc[index]))
 
     # df_new = df[['date', 'deaths', 'recovered', 'confirmed_yesterday', 'confirmed_new']]
     # ax = df_new.plot.bar(x='date', stacked=True, color=['#dd6600','#dbcd00', '#2792cb', '#00548b'])
 
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
     ax.set_xlabel("")
-    ax.set_ylabel("Fälle")
+    ax.set_ylabel("Fälle", fontsize=15)
+    ax.yaxis.set_label_position("right")
     x_labels = df["date"].dt.strftime("%d.%m.")
     ax.set_xticklabels(labels=x_labels, rotation=45, ha="right")
     ax.set(yticks=np.arange(0, max(df["confirmed"]) + 50, step=100))
-    ax.legend(['Infizierte', 'Neuinfizierte'], frameon=False)
-    ax.hlines(max(df['confirmed']), idx_doubled_since, idx_last_entry, linestyles='-', lw=1)
-    ax.vlines(idx_doubled_since, max(df['confirmed']), max(df['confirmed'] / 2), linestyles='-', lw=1)
+    ax.yaxis.tick_right()
+    ax.legend(['Infizierte', 'Neuinfektionen zum Vortag'], frameon=False)
+    ax.hlines(max(df['confirmed']), idx_doubled_since, idx_last_entry, linestyles='-', lw=1, color='#00548b')
+    ax.vlines(idx_doubled_since, max(df['confirmed']), max(df['confirmed'] / 2), linestyles='-', lw=1, color='#00548b')
     # ax.axvline(12, 0.2, 0.8, color='k', linestyle='--')
     ax.annotate(f"Letzte Verdoppelung: \n{doubled_since_in_days} Tage",(idx_doubled_since -5 ,max(df['confirmed'] / 1.5)))
 
