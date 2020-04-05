@@ -101,16 +101,16 @@ def plot_pd(df):
 
     doubled_since_in_days = (last_entry_date - doubled_since_date).days - 1
 
-    ax = df.plot.bar(x='date', y=['confirmed_yesterday', 'confirmed_new'], stacked=True, color=['#2792cb', '#00548b'], figsize=(20,10), width=0.8, fontsize=13 )
+    ax = df.plot.bar(x='date', y=['confirmed_yesterday', 'confirmed_new'], stacked=True, color=['#2792cb', '#00548b'], figsize=(20,10), width=0.8, fontsize=13, edgecolor='#2792cb', linewidth=2 )
 
     for index, row in df.iterrows():
-        text = ('{:.1%}'.format(row['confirmed_change_rate']))
-        ax.text(index -.33, df['confirmed'].loc[index] + 3.0, \
-                text, fontsize=10, color='#00548b')
+        text = ('+\n{:.0%}'.format(row['confirmed_change_rate']))
+        ax.text(index -.30, df['confirmed'].loc[index] - 13.0, \
+                text, fontsize=10, color='#FFFFFF')
 
     for index, row in df.iterrows():
         text = int(row['confirmed'])
-        ax.text(index -.33, df['confirmed'].loc[index] / 2 + 3.0, \
+        ax.text(index -.30, df['confirmed'].loc[index] / 2 + 3.0, \
                 text, fontsize=10, color='#FFFFFF')
 
     # for index, row in df.iterrows():
