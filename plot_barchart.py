@@ -25,10 +25,11 @@ def load(kommune):
     )
 
     df_confirmed.columns = ["date", "confirmed"]
-    df_confirmed.dropna(subset=["confirmed"], inplace=True)
+    # df_confirmed.dropna(subset=["confirmed"], inplace=True)
 
     df_confirmed["date"] = pd.to_datetime(df_confirmed["date"])
-    df_confirmed["confirmed_delta"] = df_confirmed["confirmed"].diff()
+    df_confirmed["confirmed_yesterday"] = df_confirmed['confirmed'] - df_confirmed['confirmed'].diff()
+    df_confirmed["confirmed_new"] = df_confirmed["confirmed"].diff()
     df_confirmed["confirmed_change_rate"] = df_confirmed["confirmed"].pct_change()
 
     df_recovered_raw = pd.read_csv(
@@ -68,7 +69,7 @@ def load(kommune):
     dfs = [df_confirmed, df_recovered, df_deaths]
     df = reduce(lambda left, right: pd.merge(left, right, on="date"), dfs)
 
-    df = df[df.confirmed >= 10].reset_index()
+    # df = df[df.confirmed >= 10].reset_index()
 
     df["active"] = df["confirmed"] - df["recovered"] - df["deaths"]
     df["active_delta"] = df_deaths["deaths"].diff()
@@ -77,105 +78,33 @@ def load(kommune):
     return df
 
 
-def plot(kommune):
+def plot_pd(df):
+    kommune = 'Stadt Münster'
     df = load(kommune)
 
-    sns.set(style="whitegrid")
+    idx_last_entry = df.index.max()
+    idx_doubled_since = df[df['confirmed'] <= max(df['confirmed'] / 2)].index.max()
 
-    # Initialize the matplotlib figure
-    f, ax = plt.subplots(figsize=(12, 10))
+    last_entry_date = df.iloc[idx_last_entry]['date']
+    doubled_since_date = df.iloc[idx_doubled_since]['date']
 
-    # Plot the total cases
-    sns.set_color_codes("pastel")
-    plot_confirmed = sns.barplot(
-        x="date", y="confirmed", data=df, label="gesamt", color="#05516D"
-    )
+    doubled_since_in_days = (last_entry_date - doubled_since_date).days - 1
 
-    for index, row in df.iterrows():
-        plot_confirmed.text(
-            row.name,
-            row.confirmed,
-            int(row.confirmed),
-            va="center",
-            color="black",
-            ha="center",
-        )
+    ax = df.plot.bar(x='date', y=['confirmed_yesterday', 'confirmed_new'], stacked=True, color=['#2792cb', '#00548b'], figsize=(12,10) )
 
-    # Plot active cases
-    plot_confirmed_delta = sns.barplot(
-        x="date", y="confirmed_delta", data=df, label="Neuinfektionen", color="#05516D"
-    )
+    # df_new = df[['date', 'deaths', 'recovered', 'confirmed_yesterday', 'confirmed_new']]
+    # ax = df_new.plot.bar(x='date', stacked=True, color=['#dd6600','#dbcd00', '#2792cb', '#00548b'])
 
-    for index, row in df.iterrows():
-        x = row.name
-        y = 0 if row.confirmed_delta == np.isnan else row.confirmed_delta
-        text = int(row.confirmed_delta) if row.confirmed_delta >= 5 else ""
-        plot_confirmed_delta.text(
-            x, y, text, va="bottom", color="black", ha="center",
-        )
-
-    plot_confirmed_delta.patches[0].set_hatch("\\")
-
-    # Plot active
-    sns.set_color_codes("muted")
-    plot_active = sns.barplot(
-        x="date", y="active", data=df, label="Infizierte", color="#E5F3FC"
-    )
-
-    for index, row in df.iterrows():
-        x = row.name
-        y = 0 if row.active == np.isnan else row.active
-        text = int(row.active) if row.active >= 5 else ""
-        plot_active.text(
-            x, y, text, va="bottom", color="black", ha="center",
-        )
-
-    plot_recovered = sns.barplot(
-        x="date", y="recovered", data=df, label="Genesene", color="g"
-    )
-
-    # for index, row in df.iterrows():
-    # x = row.name - 1
-    # y = 0 if row.confirmed_delta == np.isnan else row.confirmed_delta
-    # text = int(row.confirmed_delta) if row.confirmed_delta >= 5 else ""
-    # plot_confirmed.text(
-    # x, y, text, va="bottom", color="black", ha="center",
-    # )
-
-    plot_deaths = sns.barplot(
-        x="date", y="deaths", data=df, label="Todesfälle", color="#DD6600"
-    )
-
-    # for index, row in df.iterrows():
-    # x = row.name - 1
-    # y = 0 if row.confirmed_delta == np.isnan else row.confirmed_delta
-    # text = int(row.confirmed_delta) if row.confirmed_delta >= 5 else ""
-    # plot_confirmed.text(
-    # x, y, text, va="bottom", color="black", ha="center",
-    # )
-
-    # No bar borders
-    plt.setp(ax.patches, linewidth=0)
-    # Add a legend and informative axis label
-
-    ax.legend(ncol=3, loc="best", frameon=False)
-
-    # ax.text(
-    # 0.02,
-    # 0.98,
-    # "Entwicklung von COVID-19-Erkankungen, " + kommune,
-    # ha="left",
-    # va="top",
-    # transform=ax.transAxes,
-    # )
     ax.set_xlabel("")
-    ax.set_ylabel("")
+    ax.set_ylabel("Fälle")
     x_labels = df["date"].dt.strftime("%d.%m.")
     ax.set_xticklabels(labels=x_labels, rotation=45, ha="right")
-    sns.despine(left=True, bottom=True)
-    ax.set(yticks=np.arange(0, max(df["confirmed"]) + 50, step=20))
-
-    return f
+    ax.set(yticks=np.arange(0, max(df["confirmed"]) + 50, step=100))
+    ax.legend(['Infizierte', 'Neuinfizierte'], frameon=False)
+    ax.hlines(max(df['confirmed']), idx_doubled_since, idx_last_entry, linestyles='-', lw=1)
+    ax.vlines(idx_doubled_since, max(df['confirmed']), max(df['confirmed'] / 2), linestyles='-', lw=1)
+    # ax.axvline(12, 0.2, 0.8, color='k', linestyle='--')
+    ax.annotate(f"Letzte Verdoppelung: \n{doubled_since_in_days} Tage",(idx_doubled_since -5 ,max(df['confirmed'] / 1.5)))
 
 
 def save():
