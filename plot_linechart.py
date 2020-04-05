@@ -128,7 +128,7 @@ def save():
 
         fig = plot(kommune)
         image_name = "images/covid-19-" + kommune_short + '_line' + ".svg"
-        fig.savefig(image_name)
+        fig.savefig(image_name, bbox_inches='tight')
         f = open("diff_plot_" + kommune_short + '_line' + "_temp.html", "w")
         f.write('<div style="text-align: center;">')
         f.write("<img src='" + image_name + "'/>")
