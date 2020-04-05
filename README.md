@@ -6,6 +6,15 @@ Daten für den Regierrungsbezirk Münster, s. DAtenlizenz unten.
 Erst `python convert_ODMS_file_to_timeseries.py`, dann `python plot_data.py` ausführen.
 Für jede Kommune/Landkreise sollte nun eine lauffähige HTMl-Datei erstellt worden sein.
 
+## Gegenüberstellung der Fallzahlen von Erkrankten und bereits Genesenen
+
+In dem Repo befinden sich zwei Python-Skripte, mit denen ein Balkendiagramm und ein Liniendiagramm zur Analyse der täglichen Fallzahlen generiert werden kann:
+- plot_barchart.py
+- plot_linechart.py
+
+### Visulisierung am Beispiel der Fallzahlen von Münster
+![Balkendiagramm](https://github.com/codeformuenster/COVID-19-NRW/blob/master/images/covid-19-m%C3%BCnster.svg)
+![Liniendiagramm](https://github.com/codeformuenster/COVID-19-NRW/blob/master/images/covid-19-m%C3%BCnster_line.svg)
 
 ## Rechtliches
 
@@ -31,4 +40,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-```
