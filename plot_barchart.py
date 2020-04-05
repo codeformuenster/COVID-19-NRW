@@ -1,4 +1,5 @@
 from functools import reduce
+from datetime import datetime as dt
 
 import pandas as pd
 import numpy as np
@@ -87,127 +88,152 @@ def load(kommune):
     return df
 
 
-def plot_pd(df):
-    kommune = "Stadt Münster"
+def plot(kommune):
+    def plot_label(df, ax):
+        for index, row in df.iterrows():
+            # text = "{:.0%}".format(row["confirmed_change_rate"])
+            if (row['date'] >= dt.strptime("2020-03-13", "%Y-%m-%d")):
+                if not np.isnan(row['confirmed_new']):
+                    text = '%.0f' % row["confirmed_new"]
+
+                    ax.text(
+                        index,
+                        df['recovered'].loc[index] + df["active"].loc[index] - df["confirmed_new"].loc[index] + 3,
+                        text,
+                        horizontalalignment='center',
+                        fontsize=10,
+                        color="#FFFFFF",
+                    )
+
+        for index, row in df.iterrows():
+            if (row['date'] >= dt.strptime("2020-03-14", "%Y-%m-%d")):
+                text = int(row["active"])
+                ax.text(
+                    index,
+                    df['recovered'].loc[index] + df["active"].loc[index] / 2,
+                    text,
+                    horizontalalignment='center',
+                    fontsize=10,
+                    color="#FFFFFF",
+                )
+
+        for index, row in df.iterrows():
+            if (row['date'] >= dt.strptime("2020-03-14", "%Y-%m-%d")):
+                text = int(row["recovered"])
+                ax.text(
+                    index,
+                    df["recovered"].loc[index] / 2 + 3.0,
+                    text,
+                    horizontalalignment='center',
+                    fontsize=10,
+                    color="#FFFFFF",
+                )
+
+    def plot_doubled_since(df, ax):
+        idx_last_entry = df.index.max()
+
+        has_doubled = df["confirmed"] <= max(df["confirmed"] / 2)
+
+        if has_doubled.any():
+            idx_doubled_since = df[has_doubled].index.max()
+            last_entry_date = df.loc[idx_last_entry]["date"]
+            doubled_since_date = df.loc[idx_doubled_since]["date"]
+
+            doubled_since_in_days = (last_entry_date - doubled_since_date).days - 1
+
+            ax.hlines(
+                max(df["confirmed"]),
+                idx_doubled_since,
+                idx_last_entry,
+                linestyles='dashed',
+                lw=1,
+                color="#00548b",
+            )
+            ax.vlines(
+                idx_doubled_since,
+                max(df["confirmed"]),
+                max(df["confirmed"] / 2),
+                linestyles="dashed",
+                lw=1,
+                color="#00548b",
+            )
+            # ax.axvline(12, 0.2, 0.8, color='k', linestyle='--')
+            ax.annotate(
+                f"Letzte Verdoppelung: \n{doubled_since_in_days} Tage",
+                (idx_doubled_since + 0.5 , max(df["confirmed"] / 1.1)),
+            )
+
+    def plot_axis(ax):
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.set_xlabel("")
+        ax.set_ylabel("Anzahl an Fällen", fontsize=12)
+        ax.yaxis.set_label_position("right")
+        x_labels = df["date"].dt.strftime("%d.%m.")
+        ax.set_xticklabels(labels=x_labels, rotation=45, ha="right")
+        ax.set(yticks=np.arange(0, max(df["confirmed"]) + 50, step=100))
+        ax.yaxis.tick_right()
+
+    def plot_legend(ax):
+        ax.legend(["Genesene", "Erkrankte", "Anteil von Neuinfektionen an Erkrankten"], frameon=False)
+
+    def plot_bar(df):
+        return df.plot.bar(
+            x="date",
+            y=["recovered", "active_without_new", "confirmed_new"],
+            stacked=True,
+            color=["#dbcd00", "#2792cb", "#00548b"],
+            figsize=(20, 10),
+            width=0.8,
+            fontsize=13,
+            linewidth=2,
+        )
+
 
     df = load(kommune)
+    ax = plot_bar(df)
+    plot_label(df, ax)
+    plot_axis(ax)
+    plot_legend(ax)
+    plot_doubled_since(df, ax)
 
-    # idx_first_day_with_100_confirmed = df[df['confirmed'] >= 100].index.min()
-    # df = df.iloc[idx_first_day_with_100_confirmed:-1]
-
-    idx_last_entry = df.index.max()
-    idx_doubled_since = df[df["confirmed"] <= max(df["confirmed"] / 2)].index.max()
-
-    last_entry_date = df.loc[idx_last_entry]["date"]
-    doubled_since_date = df.loc[idx_doubled_since]["date"]
-
-    doubled_since_in_days = (last_entry_date - doubled_since_date).days - 1
-
-    ax = df.plot.bar(
-        x="date",
-        y=["recovered", "active_without_new", "confirmed_new"],
-        stacked=True,
-        color=["#dbcd00", "#2792cb", "#00548b"],
-        figsize=(20, 10),
-        width=0.8,
-        fontsize=13,
-        # edgecolor="#2792cb",
-        linewidth=2,
-    )
-
-    for index, row in df.iterrows():
-        # text = "{:.0%}".format(row["confirmed_change_rate"])
-        text = '%.0f' % row["confirmed_new"]
-        ax.text(
-            index,
-            df['recovered'].loc[index] + df["active"].loc[index] - df["confirmed_new"].loc[index] + 3,
-            # df["active"].loc[index],
-            text,
-            horizontalalignment='center',
-            fontsize=10,
-            color="#FFFFFF",
-        )
-
-    for index, row in df.iterrows():
-        text = int(row["active"])
-        ax.text(
-            index,
-            df['recovered'].loc[index] + df["active"].loc[index] / 2 + 3.0,
-            text,
-            horizontalalignment='center',
-            fontsize=10,
-            color="#FFFFFF",
-        )
-
-    for index, row in df.iterrows():
-        text = int(row["recovered"])
-        ax.text(
-            index,
-            df["recovered"].loc[index] / 2 + 3.0,
-            text,
-            horizontalalignment='center',
-            fontsize=10,
-            color="#FFFFFF",
-        )
-
-    # for index, row in df.iterrows():
-    # text = ('{:.1%}'.format(row['confirmed_change_rate']))
-    # ax.annotate(text,(index ,df['confirmed'].loc[index]))
-
-    # df_new = df[['date', 'deaths', 'recovered', 'confirmed_yesterday', 'confirmed_new']]
-    # ax = df_new.plot.bar(x='date', stacked=True, color=['#dd6600','#dbcd00', '#2792cb', '#00548b'])
-
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-    ax.set_xlabel("")
-    ax.set_ylabel("Fälle", fontsize=15)
-    ax.yaxis.set_label_position("right")
-    x_labels = df["date"].dt.strftime("%d.%m.")
-    ax.set_xticklabels(labels=x_labels, rotation=45, ha="right")
-    ax.set(yticks=np.arange(0, max(df["confirmed"]) + 50, step=100))
-    ax.yaxis.tick_right()
-    ax.legend(["Genesene", "Erkrankte", "Neuinfektionen"], frameon=False)
-    ax.hlines(
-        max(df["confirmed"]),
-        idx_doubled_since,
-        idx_last_entry,
-        linestyles='dashed',
-        lw=1,
-        color="#00548b",
-    )
-    ax.vlines(
-        idx_doubled_since,
-        max(df["confirmed"]),
-        max(df["confirmed"] / 2),
-        linestyles="dashed",
-        lw=1,
-        color="#00548b",
-    )
-    # ax.axvline(12, 0.2, 0.8, color='k', linestyle='--')
-    ax.annotate(
-        f"Letzte Verdoppelung: \n{doubled_since_in_days} Tage",
-        (idx_doubled_since - 5, max(df["confirmed"] / 1.5)),
-    )
+    return ax.get_figure()
 
 
 def save():
-    df_raw = pd.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
-    kommunen = df_raw["Kommune"].unique()
+    def get_kommunen():
+        df_raw = pd.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
+        return df_raw["Kommune"].unique()
 
-    for kommune in kommunen:
-        print(kommune)
+    def get_short_name(kommune):
+        return str.split(kommune)[1].lower()
 
-        kommune_short = str.split(kommune)[1].lower()
+    def get_image_name(short_name):
+        return "images/covid-19-" + short_name + ".svg"
 
+    def save_plotted_svg(kommune, image_name):
         fig = plot(kommune)
-        image_name = "images/covid-19-" + kommune_short + ".svg"
-        fig.savefig(image_name)
-        f = open("diff_plot_" + kommune_short + "_temp.html", "w")
+        fig.savefig(image_name, bbox_inches='tight')
+
+    def generate_html(short_name, image_name):
+        f = open("diff_plot_" + short_name + "_temp.html", "w")
         f.write('<div style="text-align: center;">')
         f.write("<img src='" + image_name + "'/>")
         f.write("</div>")
         f.close()
+
+
+    kommunen = get_kommunen()
+
+    for kommune in kommunen:
+        print(kommune)
+
+        short_name = get_short_name(kommune)
+        image_name = get_image_name(short_name)
+
+        save_plotted_svg(kommune, image_name)
+        generate_html(short_name, image_name)
 
 
 if __name__ == "__main__":
