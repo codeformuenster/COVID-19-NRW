@@ -10,6 +10,7 @@ import locale
 locale.setlocale(locale.LC_ALL, 'de_DE.utf8')
 
 os.system("python3 plot_barchart.py")
+os.system("python3 plot_linechart.py")
 
 confirmed_df = pandas.read_csv("data/time_series/time_series_covid-19_nrw_confirmed.csv")
 recovered_df = pandas.read_csv("data/time_series/time_series_covid-19_nrw_recovered.csv")
@@ -178,7 +179,7 @@ for kommune in confirmed_df.index.unique():
     # ~ auto_open=True
   )
   
-  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', kommune_short.lower()+'_log_temp.html', 'footer.html']
+  filenames = ['header.html', kommune_short.lower()+'_temp.html', 'diff_plot_' + kommune_short.lower() + '_temp.html', 'diff_plot_' + kommune_short.lower() + '_line_temp.html', kommune_short.lower()+'_log_temp.html', 'footer.html']
   with open(kommune_short.lower()+'.html', 'w') as outfile:
     for fname in filenames:
         with open(fname) as infile:
