@@ -11,13 +11,12 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 
-# set jupyter's max row display
-pd.set_option("display.max_row", 1000)
-
-# set jupyter's max column width to 50
-pd.set_option("display.max_columns", 50)
-
 matplotlib.use("agg")
+
+COLOR_DEATHS = "#dd6600"
+COLOR_RECOVERED = "#dbcd00"
+COLOR_ACTIVE = "#2792cb"
+COLOR_CONFIRMED_NEW = "#00548b"
 
 
 def load(kommune):
@@ -32,7 +31,8 @@ def load(kommune):
     )
 
     df_confirmed.columns = ["date", "confirmed"]
-    # df_confirmed.dropna(subset=["confirmed"], inplace=True)
+    df_confirmed["confirmed_data_available"] = ~df_confirmed["confirmed"].isna()
+    df_confirmed.fillna(method="ffill", inplace=True)
 
     df_confirmed["date"] = pd.to_datetime(df_confirmed["date"])
     df_confirmed["confirmed_yesterday"] = (
@@ -53,7 +53,8 @@ def load(kommune):
     )
 
     df_recovered.columns = ["date", "recovered"]
-    df_recovered.dropna(subset=["recovered"], inplace=True)
+    df_recovered["recovered_data_available"] = ~df_recovered["recovered"].isna()
+    df_recovered.fillna(method="ffill", inplace=True)
 
     df_recovered["date"] = pd.to_datetime(df_recovered["date"])
     df_recovered["recovered_delta"] = df_recovered["recovered"].diff()
@@ -69,7 +70,8 @@ def load(kommune):
     )
 
     df_deaths.columns = ["date", "deaths"]
-    df_deaths.dropna(subset=["deaths"], inplace=True)
+    df_deaths["deaths_data_available"] = ~df_deaths["deaths"].isna()
+    df_deaths.fillna(method="ffill", inplace=True)
 
     df_deaths["date"] = pd.to_datetime(df_deaths["date"])
     df_deaths["deaths_delta"] = df_deaths["deaths"].diff()
@@ -78,12 +80,14 @@ def load(kommune):
     dfs = [df_confirmed, df_recovered, df_deaths]
     df = reduce(lambda left, right: pd.merge(left, right, on="date"), dfs)
 
-    # df = df[df.confirmed >= 10].reset_index()
-
     df["active"] = df["confirmed"] - df["recovered"] - df["deaths"]
-    df["active_without_new"] = df["confirmed"] - df["recovered"] - df["deaths"] - df['confirmed_new']
+    df["active_without_new"] = (
+        df["confirmed"] - df["recovered"] - df["deaths"] - df["confirmed_new"]
+    )
     df["active_delta"] = df_deaths["deaths"].diff()
     df["active_change_rate"] = df_deaths["deaths"].pct_change()
+
+    df.fillna(value=0, inplace=True)
 
     return df
 
@@ -91,40 +95,42 @@ def load(kommune):
 def plot(kommune):
     def plot_label(df, ax):
         for index, row in df.iterrows():
-            # text = "{:.0%}".format(row["confirmed_change_rate"])
-            if (row['date'] >= dt.strptime("2020-03-13", "%Y-%m-%d")):
-                if not np.isnan(row['confirmed_new']):
-                    text = '%.0f' % row["confirmed_new"]
+            if row["date"] >= dt.strptime("2020-03-13", "%Y-%m-%d"):
+                if not np.isnan(row["confirmed_new"]):
+                    text = "%.0f" % row["confirmed_new"]
 
                     ax.text(
                         index,
-                        df['recovered'].loc[index] + df["active"].loc[index] - df["confirmed_new"].loc[index] + 3,
+                        df["recovered"].loc[index]
+                        + df["active"].loc[index]
+                        - df["confirmed_new"].loc[index]
+                        + 3,
                         text,
-                        horizontalalignment='center',
+                        horizontalalignment="center",
                         fontsize=10,
                         color="#FFFFFF",
                     )
 
         for index, row in df.iterrows():
-            if (row['date'] >= dt.strptime("2020-03-14", "%Y-%m-%d")):
-                text = int(row["active"])
+            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
+                text = "%.0f" % row["active_without_new"]
                 ax.text(
                     index,
-                    df['recovered'].loc[index] + df["active"].loc[index] / 2,
+                    df["recovered"].loc[index] + df["active"].loc[index] / 2,
                     text,
-                    horizontalalignment='center',
+                    horizontalalignment="center",
                     fontsize=10,
                     color="#FFFFFF",
                 )
 
         for index, row in df.iterrows():
-            if (row['date'] >= dt.strptime("2020-03-14", "%Y-%m-%d")):
+            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
                 text = int(row["recovered"])
                 ax.text(
                     index,
                     df["recovered"].loc[index] / 2 + 3.0,
                     text,
-                    horizontalalignment='center',
+                    horizontalalignment="center",
                     fontsize=10,
                     color="#FFFFFF",
                 )
@@ -145,9 +151,9 @@ def plot(kommune):
                 max(df["confirmed"]),
                 idx_doubled_since,
                 idx_last_entry,
-                linestyles='dashed',
+                linestyles="dashed",
                 lw=1,
-                color="#00548b",
+                color=COLOR_CONFIRMED_NEW,
             )
             ax.vlines(
                 idx_doubled_since,
@@ -155,12 +161,11 @@ def plot(kommune):
                 max(df["confirmed"] / 2),
                 linestyles="dashed",
                 lw=1,
-                color="#00548b",
+                color=COLOR_CONFIRMED_NEW,
             )
-            # ax.axvline(12, 0.2, 0.8, color='k', linestyle='--')
             ax.annotate(
-                f"Letzte Verdoppelung: \n{doubled_since_in_days} Tage",
-                (idx_doubled_since + 0.5 , max(df["confirmed"] / 1.1)),
+                f"Letzte Verdoppelung aller bestätigten Fälle: \n{doubled_since_in_days} Tage",
+                (idx_doubled_since + 0.5, max(df["confirmed"] / 1.1)),
             )
 
     def plot_axis(ax):
@@ -176,20 +181,22 @@ def plot(kommune):
         ax.yaxis.tick_right()
 
     def plot_legend(ax):
-        ax.legend(["Genesene", "Erkrankte", "Anteil von Neuinfektionen an Erkrankten"], frameon=False)
+        ax.legend(
+            ["Verstorbene", "Genesene", "Bisher Erkrankte", "Neuinfektionen",],
+            frameon=False,
+        )
 
     def plot_bar(df):
         return df.plot.bar(
             x="date",
-            y=["recovered", "active_without_new", "confirmed_new"],
+            y=["deaths", "recovered", "active_without_new", "confirmed_new"],
             stacked=True,
-            color=["#dbcd00", "#2792cb", "#00548b"],
+            color=[COLOR_DEATHS, COLOR_RECOVERED, COLOR_ACTIVE, COLOR_CONFIRMED_NEW],
             figsize=(20, 10),
             width=0.8,
             fontsize=13,
             linewidth=2,
         )
-
 
     df = load(kommune)
     ax = plot_bar(df)
@@ -214,7 +221,7 @@ def save():
 
     def save_plotted_svg(kommune, image_name):
         fig = plot(kommune)
-        fig.savefig(image_name, bbox_inches='tight')
+        fig.savefig(image_name, bbox_inches="tight")
 
     def generate_html(short_name, image_name):
         f = open("diff_plot_" + short_name + "_temp.html", "w")
@@ -222,7 +229,6 @@ def save():
         f.write("<img src='" + image_name + "'/>")
         f.write("</div>")
         f.close()
-
 
     kommunen = get_kommunen()
 
