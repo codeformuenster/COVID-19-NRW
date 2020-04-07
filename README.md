@@ -1,11 +1,21 @@
 # COVID-19-NRW
 
 Doku noch sehr rudimentär, sorry!
-Daten für den Regierrungsbezirk Münster, s. DAtenlizenz unten.
+Daten für den Regierungsbezirk Münster, s. Datenlizenz unten.
 
-Erst `python convert_ODMS_file_to_timeseries.py`, dann `python plot_data.py` ausführen.
-Für jede Kommune/Landkreise sollte nun eine lauffähige HTMl-Datei erstellt worden sein.
+Das Skript `update_plots.sh` generiert alle HTML-Seiten mit allen verfügbaren Plots basierend auf den aktuellen Daten aus dem Open-Data-Portal der Stadt Münster (s. unten).
+Dabei werden die Skripte `plot_barchart.py` und `plot_linechart.py` vom Skript `plot_data.py` aufgerufen.
+Für jede Kommune/Landkreise sollte nach Ausführen von `update_plots.sh` nun eine lauffähige HTMl-Datei erstellt worden sein (und, bei entsprechenden `git`-Rechten sollten diese Datein auch bereits hochgeladen sein).
 
+## Gegenüberstellung der Fallzahlen von Erkrankten und bereits Genesenen
+
+In dem Repo befinden sich zwei Python-Skripte, mit denen ein Balkendiagramm und ein Liniendiagramm zur Analyse der täglichen Fallzahlen generiert werden kann:
+- plot_barchart.py
+- plot_linechart.py
+
+### Visulisierung am Beispiel der Fallzahlen von Münster
+![Balkendiagramm](https://github.com/codeformuenster/COVID-19-NRW/blob/master/images/covid-19-m%C3%BCnster.svg)
+![Liniendiagramm](https://github.com/codeformuenster/COVID-19-NRW/blob/master/images/covid-19-m%C3%BCnster_line.svg)
 
 ## Rechtliches
 
@@ -31,4 +41,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-```
