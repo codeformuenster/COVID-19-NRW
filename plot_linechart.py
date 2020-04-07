@@ -122,7 +122,6 @@ def save():
     kommunen = df_raw["Kommune"].unique()
 
     for kommune in kommunen:
-        print(kommune)
 
         kommune_short = str.split(kommune)[1].lower()
 

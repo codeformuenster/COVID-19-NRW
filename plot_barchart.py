@@ -181,8 +181,10 @@ def plot(kommune):
         ax.yaxis.tick_right()
 
     def plot_legend(ax):
+        handles, labels = ax.get_legend_handles_labels()
         ax.legend(
-            ["Verstorbene", "Genesene", "Bisher Erkrankte", "Neuinfektionen",],
+            reversed(handles),
+            reversed(["Verstorbene", "Genesene", "Bisher Erkrankte", "Neuinfektionen"]),
             frameon=False,
         )
 
@@ -233,7 +235,6 @@ def save():
     kommunen = get_kommunen()
 
     for kommune in kommunen:
-        print(kommune)
 
         short_name = get_short_name(kommune)
         image_name = get_image_name(short_name)
