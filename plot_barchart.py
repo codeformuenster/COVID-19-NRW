@@ -16,7 +16,7 @@ matplotlib.use("agg")
 COLOR_DEATHS = "#dd6600"
 COLOR_RECOVERED = "#dbcd00"
 COLOR_ACTIVE = "#2792cb"
-COLOR_CONFIRMED_NEW = "#00548b"
+COLOR_CONFIRMED_NEW = "#2792cb" # a pattern is added below
 
 
 def load(kommune):
@@ -202,6 +202,12 @@ def plot(kommune):
 
     df = load(kommune)
     ax = plot_bar(df)
+    # add pattern (hatch) (only) to new infections bar
+    bars = ax.patches
+    patterns = (' ', ' ', ' ','//') # new infections is the last bar
+    hatches = [p for p in patterns for i in range(len(df))]
+    for bar, hatch in zip(bars, hatches):
+        bar.set_hatch(hatch)
     plot_label(df, ax)
     plot_axis(ax)
     plot_legend(ax)
