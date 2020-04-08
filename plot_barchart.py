@@ -17,6 +17,7 @@ COLOR_DEATHS = "#dd6600"
 COLOR_RECOVERED = "#dbcd00"
 COLOR_ACTIVE = "#2792cb"
 COLOR_CONFIRMED_NEW = "#2792cb" # a pattern is added below
+HATCH_COLOR = 'white' # currently unused, see line 213
 
 
 def load(kommune):
@@ -197,7 +198,7 @@ def plot(kommune):
             figsize=(20, 10),
             width=0.8,
             fontsize=13,
-            linewidth=2,
+            linewidth=0
         )
 
     df = load(kommune)
@@ -205,9 +206,12 @@ def plot(kommune):
     # add pattern (hatch) (only) to new infections bar
     bars = ax.patches
     patterns = (' ', ' ', ' ','//') # new infections is the last bar
+    edgecolors = (COLOR_DEATHS, COLOR_RECOVERED, COLOR_ACTIVE, HATCH_COLOR)
     hatches = [p for p in patterns for i in range(len(df))]
-    for bar, hatch in zip(bars, hatches):
-        bar.set_hatch(hatch)
+    hatches_colors = [c for c in edgecolors for i in range(len(df))]    
+    for bar, hatch, hatch_color in zip(bars, hatches, hatches_colors):
+        # bar.set_edgecolor(hatch_color) # uncomment to use HATCH_COLOR
+        bar.set_hatch(hatch)        
     plot_label(df, ax)
     plot_axis(ax)
     plot_legend(ax)
