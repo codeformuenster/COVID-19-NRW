@@ -107,12 +107,12 @@ def plot(kommune):
                         index,
                         df["recovered"].loc[index]
                         + df["active"].loc[index]
-                        - df["confirmed_new"].loc[index]
+                        + df["deaths"].loc[index]
                         + 3,
                         text,
                         horizontalalignment="center",
                         fontsize=10,
-                        color="#FFFFFF",
+                        color="#000000",
                     )
 
         for index, row in df.iterrows():
