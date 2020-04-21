@@ -40,6 +40,9 @@ def load(kommune):
         df_confirmed["confirmed"] - df_confirmed["confirmed"].diff()
     )
     df_confirmed["confirmed_new"] = df_confirmed["confirmed"].diff()
+    df_confirmed["confirmed_new"] = df_confirmed["confirmed"].diff()
+    df_confirmed.loc[df_confirmed['confirmed_new'] < 0, ['confirmed_new']] = 0
+
     df_confirmed["confirmed_change_rate"] = df_confirmed["confirmed"].pct_change()
 
     df_recovered_raw = pd.read_csv(
