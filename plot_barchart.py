@@ -128,7 +128,7 @@ def plot(kommune):
                 )
 
         for index, row in df.iterrows():
-            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
+            if row["date"] >= dt.strptime("2020-03-16", "%Y-%m-%d"):
                 text = int(row["recovered"])
                 ax.text(
                     index,
