@@ -116,7 +116,7 @@ def plot(kommune):
                     )
 
         for index, row in df.iterrows():
-            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
+            if row["date"] >= dt.strptime("2020-03-13", "%Y-%m-%d"):
                 text = "%.0f" % row["active_without_new"]
                 ax.text(
                     index,
