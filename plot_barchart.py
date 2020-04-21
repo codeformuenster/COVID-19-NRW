@@ -139,6 +139,18 @@ def plot(kommune):
                     color="#FFFFFF",
                 )
 
+        for index, row in df.iterrows():
+            if row["date"] >= dt.strptime("2020-03-26", "%Y-%m-%d"):
+                text = int(row["deaths"])
+                ax.text(
+                    index,
+                    df["deaths"].loc[index] + 3.0,
+                    text,
+                    horizontalalignment="center",
+                    fontsize=10,
+                    color="#FFFFFF",
+                )
+
     def plot_doubled_since(df, ax):
         idx_last_entry = df.index.max()
 
