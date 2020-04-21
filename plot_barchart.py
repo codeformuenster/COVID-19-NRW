@@ -223,10 +223,10 @@ def plot(kommune):
     patterns = (' ', ' ', ' ','//') # new infections is the last bar
     edgecolors = (COLOR_DEATHS, COLOR_RECOVERED, COLOR_ACTIVE, HATCH_COLOR)
     hatches = [p for p in patterns for i in range(len(df))]
-    hatches_colors = [c for c in edgecolors for i in range(len(df))]    
+    hatches_colors = [c for c in edgecolors for i in range(len(df))]
     for bar, hatch, hatch_color in zip(bars, hatches, hatches_colors):
         # bar.set_edgecolor(hatch_color) # uncomment to use HATCH_COLOR
-        bar.set_hatch(hatch)        
+        bar.set_hatch(hatch)
     plot_label(df, ax)
     plot_axis(ax)
     plot_legend(ax)
