@@ -40,6 +40,8 @@ def load(kommune):
         df_confirmed["confirmed"] - df_confirmed["confirmed"].diff()
     )
     df_confirmed["confirmed_new"] = df_confirmed["confirmed"].diff()
+    df_confirmed.loc[df_confirmed['confirmed_new'] < 0, ['confirmed_new']] = 0
+
     df_confirmed["confirmed_change_rate"] = df_confirmed["confirmed"].pct_change()
 
     df_recovered_raw = pd.read_csv(
@@ -104,16 +106,16 @@ def plot(kommune):
                         index,
                         df["recovered"].loc[index]
                         + df["active"].loc[index]
-                        - df["confirmed_new"].loc[index]
+                        + df["deaths"].loc[index]
                         + 3,
                         text,
                         horizontalalignment="center",
                         fontsize=10,
-                        color="#FFFFFF",
+                        color="#000000",
                     )
 
         for index, row in df.iterrows():
-            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
+            if row["date"] >= dt.strptime("2020-03-13", "%Y-%m-%d"):
                 text = "%.0f" % row["active_without_new"]
                 ax.text(
                     index,
@@ -125,11 +127,23 @@ def plot(kommune):
                 )
 
         for index, row in df.iterrows():
-            if row["date"] >= dt.strptime("2020-03-14", "%Y-%m-%d"):
+            if row["date"] >= dt.strptime("2020-03-16", "%Y-%m-%d"):
                 text = int(row["recovered"])
                 ax.text(
                     index,
                     df["recovered"].loc[index] / 2 + 3.0,
+                    text,
+                    horizontalalignment="center",
+                    fontsize=10,
+                    color="#FFFFFF",
+                )
+
+        for index, row in df.iterrows():
+            if row["date"] >= dt.strptime("2020-03-26", "%Y-%m-%d"):
+                text = int(row["deaths"])
+                ax.text(
+                    index,
+                    df["deaths"].loc[index] + 3.0,
                     text,
                     horizontalalignment="center",
                     fontsize=10,
@@ -208,10 +222,10 @@ def plot(kommune):
     patterns = (' ', ' ', ' ','//') # new infections is the last bar
     edgecolors = (COLOR_DEATHS, COLOR_RECOVERED, COLOR_ACTIVE, HATCH_COLOR)
     hatches = [p for p in patterns for i in range(len(df))]
-    hatches_colors = [c for c in edgecolors for i in range(len(df))]    
+    hatches_colors = [c for c in edgecolors for i in range(len(df))]
     for bar, hatch, hatch_color in zip(bars, hatches, hatches_colors):
         # bar.set_edgecolor(hatch_color) # uncomment to use HATCH_COLOR
-        bar.set_hatch(hatch)        
+        bar.set_hatch(hatch)
     plot_label(df, ax)
     plot_axis(ax)
     plot_legend(ax)
