@@ -37,7 +37,6 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
-        if: steps.branch_info.outputs.changes != '0'
         run: |
           pip install -r requirements.txt
 
