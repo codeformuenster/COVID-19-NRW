@@ -3,7 +3,8 @@ name: Update plots
 on:
   schedule:
     # run at 16:30 (German time zone) on every day-of-week from Monday through Friday.
-    - cron: '30 14 * * 1-5'
+    # disable scheduled jobs, as it fails and COVID seems to be over anyway
+    # - cron: '30 14 * * 1-5'
 
 jobs:
   staging:
